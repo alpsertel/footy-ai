@@ -12,12 +12,17 @@ def download_all_events():
 
     for idx, row in sb.competitions()[['season_id', 'competition_id']].iterrows():
         print(idx)
+
         try:
             match_ids.append(sb.matches(competition_id=row['competition_id'], season_id=row['season_id'])['match_id'].to_list())
         except:
             pass
 
+        break # remove this for all of the data
+
     flat = [item for sublist in match_ids for item in sublist]
+
+    print(flat)
 
     n_events = 3
 
@@ -41,14 +46,19 @@ def download_all_events():
                 start_index = max(0, goal_index - n_events)
                 end_index = goal_index + 1
                 previous_entries = df.iloc[start_index:end_index-1]
-                events.append(previous_entries['type'].to_list())
+                events.append(previous_entries['location'].to_list()) # type
         except Exception as e:
             print(e)
+
+        break # remove this for all of the data
     
     with open('events.csv', mode='w') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         for event in events:
-            csv_writer.writerow(event)
+            flat_positions = [item for sublist in event for item in sublist]
+            csv_writer.writerow(flat_positions)
+            #csv_writer.writerow(event)
+
 
     return events
 
